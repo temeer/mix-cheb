@@ -17,7 +17,7 @@ namespace mixhaar
         Plot2D plotExact = new Plot2D("Exact");
         Plot2D plotNum = new Plot2D("Numerical");
         private double SegmentStart = 0;
-        private double SegmentEnd = 1;
+        private double SegmentEnd = 99;
 
 
 
@@ -34,7 +34,7 @@ namespace mixhaar
         {
             Func<double, double> a2, a1, a0, f, exactSolution;
             double y0, y1;
-            Example3(out a2, out a1, out a0, out f, out exactSolution, out y0, out y1);
+            Example5(out a2, out a1, out a0, out f, out exactSolution, out y0, out y1);
 
             plotExact.DiscreteFunction = new DiscreteFunction2D(exactSolution, SegmentStart, SegmentEnd, 1000);
             plotExact.Refresh();
@@ -84,20 +84,48 @@ namespace mixhaar
             exactSolution = t => t * t * t;
             y0 = y1 = 0;
         }
+        public void Example5(out Func<double, double> a2, out Func<double, double> a1, out Func<double, double> a0,
+        out Func<double, double> f, out Func<double, double> exactSolution, out double y0, out double y1)
+        {
+            a2 = t => 6;
+            a1 = t => 1;
+            a0 = t => 3;
+            f = t => -0.06 * Math.Sin(0.1 * t) + 0.1 * Math.Cos(0.1 * t) + 3 * Math.Sin(0.1 * t);
+            exactSolution = t => Math.Sin(0.1 * t);
+            y0 = y1 = 0;
+        }
 
-        public Func<double, double> Solve()
+        /*public Func<double, double> Solve()
         {
             int nodesCount = (int)nupNodesCount.Value;
             int coeffsCount = (int)nupCoeffsCount.Value;
 
             var nodes = Enumerable.Range(0, nodesCount).Select(j => SegmentStart + j * (SegmentEnd - SegmentStart) / (nodesCount - 1)).ToArray();
             return solver.Solve(nodes, coeffsCount);
+        }*/
+
+        public double[] Solve()
+        {
+            int nodesCount = (int)nupNodesCount.Value;
+            int coeffsCount = (int)nupCoeffsCount.Value;
+
+            //var nodes = Enumerable.Range(0, nodesCount).Select(j => SegmentStart + j * (SegmentEnd - SegmentStart) / (nodesCount - 1)).ToArray();
+            int N = 100;
+            return solver.Solve(N, coeffsCount);
         }
 
         public void Draw()
         {
             var numSolution = Solve();
-            plotNum.DiscreteFunction = new DiscreteFunction2D(numSolution, SegmentStart, SegmentEnd, 1000);
+            int N = 100;
+            //plotNum.DiscreteFunction = new DiscreteFunction2D(numSolution, SegmentStart, SegmentEnd, 1000);
+            double[] x = new double[N];
+            for (int i = 0; i < N; i++) {
+                x[i] = i;
+            }
+
+            plotNum.DiscreteFunction = new DiscreteFunction2D(x, numSolution);
+
             plotNum.Refresh();
         }
 
